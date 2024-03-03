@@ -27,7 +27,7 @@ import (
 //	text := cache.New(db, cli)
 func New(cache Cache, embed embeddings.Embeddings) *Client {
 	return &Client{
-		atoms: atom.New(atomHashMap(cache)),
+		atoms: atom.New(atom.NewPermanentMap(cache)),
 		embed: embed,
 		cache: cache,
 	}
@@ -43,7 +43,7 @@ func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) 
 	}
 
 	var bkey [5]byte
-	bkey[0] = 'e'
+	bkey[0] = 'f'
 	binary.LittleEndian.PutUint32(bkey[1:], code)
 
 	val, err := c.cache.Get(bkey[:])
