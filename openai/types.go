@@ -20,21 +20,17 @@ import (
 
 type Option func(*Client)
 
-func WithModelText3Small() Option {
-	return func(c *Client) {
-		c.model = "text-embedding-3-small"
-	}
-}
+type ModelID string
 
-func WithModelText3Large() Option {
-	return func(c *Client) {
-		c.model = "text-embedding-3-large"
-	}
-}
+const (
+	TEXT_EMBEDDING_3_SMALL = ModelID("text-embedding-3-small")
+	TEXT_EMBEDDING_3_LARGE = ModelID("text-embedding-3-large")
+	TEXT_ADA_002           = ModelID("text-embedding-ada-002")
+)
 
-func WithModelTextAda002() Option {
+func WithModel(id ModelID) Option {
 	return func(c *Client) {
-		c.model = "text-embedding-ada-002"
+		c.model = id
 	}
 }
 
@@ -79,13 +75,13 @@ type Client struct {
 	http.Stack
 	host           ø.Authority
 	secret         string
-	model          string
+	model          ModelID
 	consumedTokens int
 }
 
 type request struct {
-	Model string `json:"model"`
-	Text  string `json:"input"`
+	Model ModelID `json:"model"`
+	Text  string  `json:"input"`
 }
 
 type embeddings struct {

@@ -15,15 +15,27 @@ import (
 
 type Option func(*Client)
 
+type ModelID string
+
+const (
+	TITAN_EMBED_TEXT_V1 = ModelID("amazon.titan-embed-text-v1")
+)
+
 func WithConfig(cfg aws.Config) Option {
-	return func(e *Client) {
-		e.api = bedrockruntime.NewFromConfig(cfg)
+	return func(c *Client) {
+		c.api = bedrockruntime.NewFromConfig(cfg)
+	}
+}
+
+func WithModel(id ModelID) Option {
+	return func(c *Client) {
+		c.model = id
 	}
 }
 
 type Client struct {
 	api            *bedrockruntime.Client
-	model          string
+	model          ModelID
 	consumedTokens int
 }
 

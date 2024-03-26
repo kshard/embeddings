@@ -26,9 +26,7 @@ import (
 //
 //	WithSecret(secret string)
 //	WithNetRC(host string)
-//	WithModelText3Small()
-//	WithModelText3Large()
-//	WithModelTextAda002()
+//	WithModel(...)
 //	WithHTTP(opts ...http.Config)
 func New(opts ...Option) (*Client, error) {
 	api := &Client{
@@ -36,7 +34,7 @@ func New(opts ...Option) (*Client, error) {
 	}
 
 	defs := []Option{
-		WithModelText3Small(),
+		WithModel(TEXT_EMBEDDING_3_SMALL),
 		WithNetRC(string(api.host)),
 	}
 
