@@ -27,6 +27,15 @@ import (
 //	WithConfig(cfg aws.Config)
 func New(opts ...Option) (*Client, error) {
 	embeddings := &Client{}
+
+	defs := []Option{
+		WithModel(TITAN_EMBED_TEXT_V1),
+	}
+
+	for _, opt := range defs {
+		opt(embeddings)
+	}
+
 	for _, opt := range opts {
 		opt(embeddings)
 	}
@@ -35,9 +44,7 @@ func New(opts ...Option) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	embeddings.api = api
-	embeddings.model = "amazon.titan-embed-text-v1"
 
 	return embeddings, nil
 }
@@ -69,7 +76,7 @@ func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) 
 	}
 
 	req := &bedrockruntime.InvokeModelInput{
-		ModelId:     aws.String(c.model),
+		ModelId:     aws.String(string(c.model)),
 		ContentType: aws.String("application/json"),
 		Body:        body,
 	}
