@@ -43,7 +43,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@users.noreply.github.com"
-          for mod in `grep -roh "const version = \".*" * | grep -oh "[[:alpha:]]*/v[0-9]*\.[0-9]*\.[0-9]*"`
+          for mod in `grep -roh "const version = \".*" * | grep -oh "[[:alpha:]]*/*v[0-9]*\.[0-9]*\.[0-9]*"`
           do
             git tag $mod 2> /dev/null && git push origin -u $mod && echo "[+] $mod" || echo "[ ] $mod"
           done
