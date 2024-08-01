@@ -6,6 +6,6 @@
 // https://github.com/kshard/embeddings
 //
 
-package bedrock
+package openai
 
-const Version = "bedrock/v0.0.4"
+const Version = "openai/v0.0.3"

@@ -6,6 +6,6 @@
 // https://github.com/kshard/embeddings
 //
 
-package bedrock
+package word2vec
 
-const Version = "bedrock/v0.0.4"
+const Version = "word2vec/v0.0.3"

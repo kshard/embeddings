@@ -6,6 +6,6 @@
 // https://github.com/kshard/embeddings
 //
 
-package bedrock
+package cache
 
-const Version = "bedrock/v0.0.4"
+const Version = "cache/v0.0.3"
