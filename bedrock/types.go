@@ -17,8 +17,16 @@ type Option func(*Client)
 
 type ModelID string
 
+// See https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html
 const (
 	TITAN_EMBED_TEXT_V1 = ModelID("amazon.titan-embed-text-v1")
+	TITAN_EMBED_TEXT_V2 = ModelID("amazon.titan-embed-text-v2:0")
+)
+
+const (
+	EMBEDDING_SIZE_256  = 256
+	EMBEDDING_SIZE_512  = 512
+	EMBEDDING_SIZE_1024 = 1024
 )
 
 func WithConfig(cfg aws.Config) Option {
@@ -33,14 +41,25 @@ func WithModel(id ModelID) Option {
 	}
 }
 
+func WithTitanV1() Option { return WithModel(TITAN_EMBED_TEXT_V1) }
+func WithTitanV2() Option { return WithModel(TITAN_EMBED_TEXT_V2) }
+
+func WithDimension(d int) Option {
+	return func(c *Client) {
+		c.dimensions = d
+	}
+}
+
 type Client struct {
 	api            *bedrockruntime.Client
 	model          ModelID
+	dimensions     int
 	consumedTokens int
 }
 
 type request struct {
-	Text string `json:"inputText"`
+	Text       string `json:"inputText"`
+	Dimensions int    `json:"dimensions,omitempty"`
 }
 
 type embeddings struct {

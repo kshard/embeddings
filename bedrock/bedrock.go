@@ -29,7 +29,7 @@ func New(opts ...Option) (*Client, error) {
 	embeddings := &Client{}
 
 	defs := []Option{
-		WithModel(TITAN_EMBED_TEXT_V1),
+		WithModel(TITAN_EMBED_TEXT_V2),
 	}
 
 	for _, opt := range defs {
@@ -70,7 +70,12 @@ func (c *Client) ConsumedTokens() int { return c.consumedTokens }
 
 // Calculates embedding vector
 func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) {
-	body, err := json.Marshal(request{Text: text})
+	body, err := json.Marshal(
+		request{
+			Text:       text,
+			Dimensions: c.dimensions,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
