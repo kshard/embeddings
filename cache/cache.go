@@ -10,11 +10,11 @@ package cache
 
 import (
 	"context"
+	"crypto/sha1"
 	"encoding/binary"
 	"log/slog"
 	"math"
 
-	"github.com/kshard/atom"
 	"github.com/kshard/embeddings"
 )
 
@@ -27,26 +27,24 @@ import (
 //	text := cache.New(db, cli)
 func New(cache Cache, embed embeddings.Embeddings) *Client {
 	return &Client{
-		atoms: atom.New(atom.NewPermanentMap(cache)),
 		embed: embed,
 		cache: cache,
 	}
+}
+
+func (c *Client) HashKey(text string) []byte {
+	hash := sha1.New()
+	hash.Write([]byte(text))
+	return hash.Sum(nil)
 }
 
 func (c *Client) ConsumedTokens() int { return c.embed.ConsumedTokens() }
 
 // Calculates embedding vector
 func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) {
-	code, err := c.atoms.Atom(text)
-	if err != nil {
-		return nil, err
-	}
+	hkey := c.HashKey(text)
 
-	var bkey [5]byte
-	bkey[0] = 'f'
-	binary.LittleEndian.PutUint32(bkey[1:], code)
-
-	val, err := c.cache.Get(bkey[:])
+	val, err := c.cache.Get(hkey)
 	if err != nil {
 		return nil, err
 	}
@@ -60,9 +58,9 @@ func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) 
 		return nil, err
 	}
 
-	err = c.cache.Put(bkey[:], encodeFVec(vec))
+	err = c.cache.Put(hkey, encodeFVec(vec))
 	if err != nil {
-		slog.Warn("failed to cache vector")
+		slog.Warn("failed to cache vector", "error", err)
 	}
 
 	return vec, nil

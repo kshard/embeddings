@@ -9,7 +9,6 @@
 package cache
 
 import (
-	"github.com/kshard/atom"
 	"github.com/kshard/embeddings"
 )
 
@@ -26,7 +25,6 @@ type Cache interface {
 }
 
 type Client struct {
-	atoms *atom.Pool
 	embed embeddings.Embeddings
 	cache Cache
 }
