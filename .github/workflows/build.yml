@@ -22,11 +22,11 @@ jobs:
      
       - name: go build
         run: |
-          go build ./...
+          find . -name go.mod -execdir go build ./... \;
     
       - name: go test
         run: |
-          go test -v -coverprofile=profile.cov $(go list ./... | grep -v /examples/)
+          find . -name go.mod -execdir go test -coverprofile=profile.cov ./... \;
 
       - uses: shogo82148/actions-goveralls@v1
         continue-on-error: true
