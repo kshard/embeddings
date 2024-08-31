@@ -8,4 +8,4 @@
 
 package bedrock
 
-const Version = "bedrock/v0.1.0"
+const Version = "bedrock/v0.1.1"

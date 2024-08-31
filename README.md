@@ -1,16 +1,84 @@
-# embeddings
+<p align="center">
+  <img src="./doc/golem.svg" height="240" />
+  <h3 align="center">Embeddings</h3>
+  <p align="center"><strong>adapter over various popular vector embeddings interfaces: AWS BedRock, OpenAI, word2vec</strong></p>
 
-The library is adapter over various popular vector embedding interfaces: AWS BedRock, OpenAI, word2vec.
+  <p align="center">
+    <!-- Build Status  -->
+    <a href="https://github.com/kshard/embeddings/actions/">
+      <img src="https://github.com/kshard/embeddings/workflows/build/badge.svg" />
+    </a>
+    <!-- GitHub -->
+    <a href="https://github.com/kshard/embeddings">
+      <img src="https://img.shields.io/github/last-commit/kshard/embeddings.svg" />
+    </a>
+    <!-- Coverage -->
+    <a href="https://coveralls.io/github/kshard/embeddings?branch=main">
+      <img src="https://coveralls.io/repos/github/kshard/embeddings/badge.svg?branch=main" />
+    </a>
+    <!-- Go Card -->
+    <a href="https://goreportcard.com/report/github.com/kshard/embeddings">
+      <img src="https://goreportcard.com/badge/github.com/kshard/embeddings" />
+    </a>
+  </p>
 
-[![Version](https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=bedrock/*)](https://github.com/kshard/embeddings/releases)
-[![Version](https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=openai/*)](https://github.com/kshard/embeddings/releases)
-[![Version](https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=word2vec/*)](https://github.com/kshard/embeddings/releases)
-[![Version](https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=cache/*)](https://github.com/kshard/embeddings/releases)
-[![Documentation](https://pkg.go.dev/badge/github.com/kshard/embeddings)](https://pkg.go.dev/github.com/kshard/embeddings)
-[![Build Status](https://github.com/kshard/embeddings/workflows/build/badge.svg)](https://github.com/kshard/embeddings/actions/)
-[![Git Hub](https://img.shields.io/github/last-commit/kshard/embeddings.svg)](https://github.com/kshard/embeddings)
-[![Coverage Status](https://coveralls.io/repos/github/kshard/embeddings/badge.svg?branch=main)](https://coveralls.io/github/kshard/embeddings?branch=main)
-[![Go Report Card](https://goreportcard.com/badge/github.com/kshard/embeddings)](https://goreportcard.com/report/github.com/kshard/embeddings)
+  <table align="center">
+    <thead><tr><th>sub-module</th><th>doc</th><th>about</th></tr></thead>
+    <tbody>
+    <!-- Module bedrock -->
+    <tr><td><a href="./bedrock/">
+      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=bedrock/*"/>
+    </a></td>
+    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/bedrock">
+      <img src="https://img.shields.io/badge/doc-bedrock-007d9c?logo=go&logoColor=white&style=flat-square" />
+    </a></td>
+    <td>
+    AWS Bedrock embeddings models
+    </td></tr>
+		<!-- Module cache -->
+    <tr><td><a href="./cache/">
+      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=cache/*"/>
+    </a></td>
+    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/cache">
+      <img src="https://img.shields.io/badge/doc-cache-007d9c?logo=go&logoColor=white&style=flat-square" />
+    </a></td>
+    <td>
+    Caching vector embeddings
+    </td></tr>
+		<!-- Module openai -->
+    <tr><td><a href="./openai/">
+      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=openai/*"/>
+    </a></td>
+    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/openai">
+      <img src="https://img.shields.io/badge/doc-openai-007d9c?logo=go&logoColor=white&style=flat-square" />
+    </a></td>
+    <td>
+    OpenAI embeddings models
+    </td></tr>
+		<!-- Module scanner -->
+    <tr><td><a href="./scanner/">
+      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=scanner/*"/>
+    </a></td>
+    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/scanner">
+      <img src="https://img.shields.io/badge/doc-scanner-007d9c?logo=go&logoColor=white&style=flat-square" />
+    </a></td>
+    <td>
+    Semantic chunking utility
+    </td></tr>
+		<!-- Module word2vec -->
+    <tr><td><a href="./scanner/">
+      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=word2vec/*"/>
+    </a></td>
+    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/scanner">
+      <img src="https://img.shields.io/badge/doc-word2vec-007d9c?logo=go&logoColor=white&style=flat-square" />
+    </a></td>
+    <td>
+    Word2Vec embeddings model
+    </td></tr>
+	</table>
+</p>
+
+---
 
 ## Inspiration
 
@@ -23,10 +91,9 @@ type Embeddings interface {
 ```
 
 The library is structured from submodules, each implements the defined interface towards vendor. 
-* [github.com/kshard/embeddings/bedrock](./bedrock/) adapts [AWS BedRock embeddings](https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html)
-* [github.com/kshard/embeddings/openai](./openai/) adapts [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) 
-* [github.com/kshard/embeddings/word2vec](./word2vec/) adapts [word2vec model](https://github.com/fogfish/word2vec)
-* [github.com/kshard/embeddings/cache](./cache/) caching embeddings either in-memory or persistently.
+* [AWS BedRock embeddings](https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html)
+* [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) 
+* [word2vec model](https://github.com/fogfish/word2vec)
 
 
 ## Getting started

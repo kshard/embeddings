@@ -1,6 +1,6 @@
 module github.com/kshard/embeddings/openai
 
-go 1.21.3
+go 1.23
 
 require (
 	github.com/fogfish/gurl/v2 v2.8.2
