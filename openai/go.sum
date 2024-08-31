@@ -3,7 +3,6 @@ github.com/ajg/form v1.5.2-0.20200323032839-9aeb3cf462e1/go.mod h1:uL1WgH+h2mgNt
 github.com/fogfish/gurl/v2 v2.8.2 h1:VB+3lsNg1i9XPm8pDVaZongNfk17NfS5FG2TFtTeLno=
 github.com/fogfish/gurl/v2 v2.8.2/go.mod h1:VDPaGeyMSZsbFByZXwKZuwKgOC1mOQNlOYhM4RgOVWQ=
 github.com/fogfish/it/v2 v2.0.1 h1:vu3kV2xzYDPHoMHMABxXeu5CoMcTfRc4gkWkzOUkRJY=
-github.com/fogfish/it/v2 v2.0.1/go.mod h1:h5FdKaEQT4sUEykiVkB8VV4jX27XabFVeWhoDZaRZtE=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/jdxcode/netrc v1.0.0 h1:tJR3fyzTcjDi22t30pCdpOT8WJ5gb32zfYE1hFNCOjk=

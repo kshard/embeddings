@@ -1,6 +1,6 @@
 module github.com/kshard/embeddings/bedrock
 
-go 1.21.3
+go 1.22
 
 require (
 	github.com/aws/aws-cdk-go/awscdk/v2 v2.150.0
@@ -34,6 +34,6 @@ require (
 	github.com/yuin/goldmark v1.4.13 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.18.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 )

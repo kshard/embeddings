@@ -8,4 +8,4 @@
 
 package openai
 
-const Version = "openai/v0.0.3"
+const Version = "openai/v0.1.0"

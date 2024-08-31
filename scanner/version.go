@@ -6,6 +6,6 @@
 // https://github.com/kshard/embeddings
 //
 
-package word2vec
+package scanner
 
-const Version = "word2vec/v0.1.0"
+const Version = "scanner/v0.0.1"
