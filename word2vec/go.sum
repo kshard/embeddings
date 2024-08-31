@@ -1,2 +1,4 @@
 github.com/fogfish/word2vec v0.0.0-20240225155258-5a869a46f03b h1:yEPjCHjxAsG9yCeZfeYbQeFmQ4GxXfDYSnppCqvwGoE=
 github.com/fogfish/word2vec v0.0.0-20240225155258-5a869a46f03b/go.mod h1:bTVg8hy/jLRSV4sxReQwYOCuprLyn2R4FGVWRxn2KCY=
+github.com/fogfish/word2vec v0.0.0-20240719202529-86d9af74f0ca h1:uWYwo0aVXvU9tKyZSuh4e0Pdf5mzNHDqDaOwO9CsiG4=
+github.com/fogfish/word2vec v0.0.0-20240719202529-86d9af74f0ca/go.mod h1:bTVg8hy/jLRSV4sxReQwYOCuprLyn2R4FGVWRxn2KCY=
