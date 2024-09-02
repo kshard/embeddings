@@ -10,7 +10,6 @@ package scanner
 
 import (
 	"context"
-	"strings"
 
 	"github.com/kshard/embeddings"
 )
@@ -100,7 +99,7 @@ func (s *Scanner) read() ([][]string, error) {
 	wn := s.windowInSentences
 	for s.scanner.Scan() && wb > 0 && wn > 0 {
 		txt := s.scanner.Text()
-		v32, err := s.embed.Embedding(context.Background(), strings.ToLower(txt))
+		v32, err := s.embed.Embedding(context.Background(), txt)
 		if err != nil {
 			return nil, err
 		}
