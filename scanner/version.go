@@ -8,4 +8,4 @@
 
 package scanner
 
-const Version = "scanner/v0.0.1"
+const Version = "scanner/v0.0.2"

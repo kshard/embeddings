@@ -18,9 +18,9 @@ import (
 )
 
 func TestScanner(t *testing.T) {
-	text := "a.bb.c.ddd.ff."
+	text := "a. bb. c. ddd. ff."
 
-	s := scanner.New(embed{}, strings.NewReader(text))
+	s := scanner.New(embed{}, scanner.NewSentences(strings.NewReader(text)))
 	s.Similarity(similar)
 
 	it.Then(t).Should(

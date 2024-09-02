@@ -9,9 +9,8 @@
 package scanner
 
 import (
-	"bufio"
 	"context"
-	"io"
+	"strings"
 
 	"github.com/kshard/embeddings"
 )
@@ -36,31 +35,30 @@ type Scanner struct {
 	similarity        func([]float32, []float32) bool
 	windowInBytes     int
 	windowInSentences int
-	scanner           *bufio.Scanner
+	scanner           Reader
 	err               error
 	cursor            int
 	text              [][]string
 }
 
-// Creates new instance of Scanner to read from io.Reader and using embedding.
-func New(embed embeddings.Embeddings, r io.Reader) *Scanner {
-	scanner := bufio.NewScanner(r)
-	scanner.Split(ScanSentence)
+// Reader is an interface similar to [bufio.Scanner].
+// It defines core functionality used by semantic chunking.
+type Reader interface {
+	Scan() bool
+	Text() string
+	Err() error
+}
 
+// Creates new instance of Scanner to read from io.Reader and using embedding.
+func New(embed embeddings.Embeddings, r Reader) *Scanner {
 	return &Scanner{
 		embed:             embed,
 		similarity:        HighSimilarity,
 		windowInBytes:     4096,
 		windowInSentences: 32,
-		scanner:           scanner,
+		scanner:           r,
 		cursor:            -1,
 	}
-}
-
-// Split sets the split function for the [Scanner].
-// The default split function is [ScanSentence].
-func (s *Scanner) Split(split bufio.SplitFunc) {
-	s.scanner.Split(split)
 }
 
 // Similarity sets the similarity function for the Scanner.
@@ -102,7 +100,7 @@ func (s *Scanner) read() ([][]string, error) {
 	wn := s.windowInSentences
 	for s.scanner.Scan() && wb > 0 && wn > 0 {
 		txt := s.scanner.Text()
-		v32, err := s.embed.Embedding(context.Background(), txt)
+		v32, err := s.embed.Embedding(context.Background(), strings.ToLower(txt))
 		if err != nil {
 			return nil, err
 		}
