@@ -10,6 +10,7 @@ package scanner
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kshard/embeddings"
 )
@@ -101,11 +102,11 @@ func (s *Scanner) Scan() bool {
 // fill the window
 func (s *Scanner) fill() (bool, error) {
 	wn := s.windowInSentences - len(s.window)
-	for s.scanner.Scan() && wn > 0 {
+	for wn > 0 && s.scanner.Scan() {
 		txt := s.scanner.Text()
 		v32, err := s.embed.Embedding(context.Background(), txt)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("embedding has failed: %w, for {%s}", err, txt)
 		}
 
 		s.window = append(s.window, vector{text: txt, vector: v32})

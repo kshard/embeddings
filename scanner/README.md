@@ -42,4 +42,8 @@ func main() {
     text := s.Text()
     fmt.Printf("%s\n", strings.Join(text, " "))
   }
+
+  if err := s.Err(); err != nil {
+    panic(err)
+  }
 ```
