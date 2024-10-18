@@ -10,6 +10,7 @@ package scanner
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kshard/embeddings"
 )
@@ -32,12 +33,12 @@ import (
 type Scanner struct {
 	embed             embeddings.Embeddings
 	similarity        func([]float32, []float32) bool
-	windowInBytes     int
 	windowInSentences int
 	scanner           Reader
 	err               error
-	cursor            int
-	text              [][]string
+	eof               bool
+	window            []vector
+	cursor            []string
 }
 
 // Reader is an interface similar to [bufio.Scanner].
@@ -48,15 +49,19 @@ type Reader interface {
 	Err() error
 }
 
+type vector struct {
+	text   string
+	vector []float32
+}
+
 // Creates new instance of Scanner to read from io.Reader and using embedding.
 func New(embed embeddings.Embeddings, r Reader) *Scanner {
 	return &Scanner{
 		embed:             embed,
 		similarity:        HighSimilarity,
-		windowInBytes:     4096,
 		windowInSentences: 32,
 		scanner:           r,
-		cursor:            -1,
+		window:            make([]vector, 0),
 	}
 }
 
@@ -67,76 +72,77 @@ func (s *Scanner) Similarity(f func([]float32, []float32) bool) {
 }
 
 // Widow defines the context window for similarity detection.
-// The default value is either 4K bytes or 32 sentences.
-func (s *Scanner) Window(n int, size int) {
-	s.windowInBytes = size
+// The default value is 32 sentences.
+func (s *Scanner) Window(n int) {
 	s.windowInSentences = n
 }
 
 func (s *Scanner) Err() error     { return s.err }
-func (s *Scanner) Text() []string { return s.text[s.cursor] }
+func (s *Scanner) Text() []string { return s.cursor }
 
 // Scan advances the Scanner through context window, sequences will be available
 // through [Scanner.Text]. It returns false if there was I/O error or EOF is reached.
 func (s *Scanner) Scan() bool {
-	if s.text == nil || s.cursor == len(s.text)-1 {
-		s.text, s.err = s.read()
+	if s.err != nil {
+		return false
+	}
+
+	if !s.eof {
+		s.eof, s.err = s.fill()
 		if s.err != nil {
 			return false
 		}
-		s.cursor = -1
 	}
-	s.cursor++
 
-	return s.cursor < len(s.text)
+	s.cursor = s.peek()
+
+	return !(s.eof && len(s.cursor) == 0)
 }
 
-func (s *Scanner) read() ([][]string, error) {
-	var seq []string
-	var vec [][]float32
-
-	wb := s.windowInBytes
-	wn := s.windowInSentences
-	for s.scanner.Scan() && wb > 0 && wn > 0 {
+// fill the window
+func (s *Scanner) fill() (bool, error) {
+	wn := s.windowInSentences - len(s.window)
+	for wn > 0 && s.scanner.Scan() {
 		txt := s.scanner.Text()
 		v32, err := s.embed.Embedding(context.Background(), txt)
 		if err != nil {
-			return nil, err
+			return false, fmt.Errorf("embedding has failed: %w, for {%s}", err, txt)
 		}
 
-		seq = append(seq, txt)
-		vec = append(vec, v32)
-		wb -= len(txt)
+		s.window = append(s.window, vector{text: txt, vector: v32})
 		wn--
 	}
 
 	if err := s.scanner.Err(); err != nil {
-		return nil, err
+		return false, err
 	}
 
-	return s.groupBy(seq, vec), nil
+	return wn != 0, nil
 }
 
-func (s *Scanner) groupBy(seq []string, vec [][]float32) [][]string {
-	var groups [][]string
-	visited := make([]bool, len(vec))
-
-	for i, p1 := range seq {
-		if visited[i] {
-			continue
-		}
-		// Start a new group with point p1
-		group := []string{p1}
-		visited[i] = true
-
-		for j, p2 := range seq {
-			if !visited[j] && s.similarity(vec[i], vec[j]) {
-				group = append(group, p2)
-				visited[j] = true
-			}
-		}
-		groups = append(groups, group)
+// peek similar from the window
+func (s *Scanner) peek() []string {
+	if len(s.window) == 0 {
+		return nil
 	}
 
-	return groups
+	a, b := make([]vector, 0), make([]vector, 0)
+	a = append(a, s.window[0])
+
+	for i := 1; i < len(s.window); i++ {
+		tail := a[len(a)-1]
+		if s.similarity(tail.vector, s.window[i].vector) {
+			a = append(a, s.window[i])
+		} else {
+			b = append(b, s.window[i])
+		}
+	}
+
+	s.window = b
+
+	seq := make([]string, len(a))
+	for i, x := range a {
+		seq[i] = x.text
+	}
+	return seq
 }
