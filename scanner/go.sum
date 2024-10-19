@@ -1,5 +1,13 @@
 github.com/chewxy/math32 v1.11.0 h1:8sek2JWqeaKkVnHa7bPVqCEOUPbARo4SGxs6toKyAOo=
 github.com/chewxy/math32 v1.11.0/go.mod h1:dOB2rcuFrCn6UHrze36WSLVPKtzPMRAQvBvUwkSsLqs=
+github.com/fogfish/golem/hseq v1.2.0 h1:B6yrzOHQNoTqSlhLb+AvK7dhEAELjHThrCQTF/uqwbM=
+github.com/fogfish/golem/hseq v1.2.0/go.mod h1:17XORt8nNKl6KOhF43MHSmjK8NksbkBsohAoJGiinUs=
+github.com/fogfish/golem/optics v0.13.0 h1:U3htppjVTMbICQIzPTTe151+WziSGEppNVmkanKa440=
+github.com/fogfish/golem/optics v0.13.0/go.mod h1:U1y90OVcXF/A61dIP3abQ0x2GweTmzVHPC15pv0pcM0=
+github.com/fogfish/golem/trait v0.2.0 h1:cgc+5TEpmoYfR3hMZZAJDvp7k9wRrYbrGT93isKHq28=
+github.com/fogfish/golem/trait v0.2.0/go.mod h1:MLcG+cb4EQvdvyW/dFUpm+1WWsmS/khiOlfs7Eoe1ko=
+github.com/fogfish/golem/trait v0.3.0 h1:3jUC2hG/4lPHE30csmSJCJKZ5N2AnciAx3PZZrhsuJA=
+github.com/fogfish/golem/trait v0.3.0/go.mod h1:MLcG+cb4EQvdvyW/dFUpm+1WWsmS/khiOlfs7Eoe1ko=
 github.com/fogfish/it/v2 v2.0.2 h1:UR6yVemf8zD3WVs6Bq0zE6LJwapZ8urv9zvU5VB5E6o=
 github.com/fogfish/it/v2 v2.0.2/go.mod h1:HHwufnTaZTvlRVnSesPl49HzzlMrQtweKbf+8Co/ll4=
 github.com/kshard/embeddings v0.0.3 h1:gtFTT7RyzfVrMyKNo9ZgvVdu1mdhmI4UjEiQbCBdjVY=

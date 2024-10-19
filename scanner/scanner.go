@@ -18,11 +18,16 @@ import (
 // Scanner provides a convenient solution for semantic chunking.
 // Successive calls to the Scanner.Scan method will step through the context
 // windows of a file and grouping sentences semantically. The context window
-// is defined either by the length of text or number sentences, use Window
-// method to change default 4K and 32 sentences value. The specification of
-// a sentence is defined by a split function of type SplitFunc; the default
-// split function breaks the input into sentences using punctuation runes.
-// Use Split function to define own algorithms.
+// is defined either by number sentences, use Window method to change
+// default 32 sentences value.
+//
+// The specification of a sentence is defined by the Reader interface, which
+// is compatible with [bufio.NewScanner]. Use a Split function of type SplitFunc
+// within [bufio.NewScanner] to control sentence breakdown.
+//
+// The module provides [NewSentences] utility that breaks the input into
+// sentences using punctuation runes. Redefine Use Split function of
+// [bufio.NewScanner] to define own algorithms.
 //
 // The scanner uses embeddings to determine similarity. Use Similarity method
 // to change the default high cosine similarity to own implementation.

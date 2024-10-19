@@ -22,6 +22,7 @@ func TestScanner(t *testing.T) {
 
 	s := scanner.New(embed{}, scanner.NewSentences(strings.NewReader(text)))
 	s.Similarity(similar)
+	s.Window(3)
 
 	it.Then(t).Should(
 		it.True(s.Scan()),
