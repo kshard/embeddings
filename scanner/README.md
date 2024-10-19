@@ -33,7 +33,7 @@ func main() {
   }
 
   // create and config scanner instance
-  s := scanner.New(embeddings, bufio.NewScanner(fd))
+  s := scanner.New(embeddings, scanner.NewSentences(fd))
   s.Similarity(scanner.HighSimilarity)
   s.Window(96)
 
