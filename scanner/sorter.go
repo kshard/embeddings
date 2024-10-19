@@ -103,11 +103,7 @@ func (s *Sorter[T]) fill() (bool, error) {
 		wn--
 	}
 
-	if !has {
-		s.scanner = nil
-	}
-
-	return wn != 0, nil
+	return !has || wn != 0, nil
 }
 
 // peek similar from the window
