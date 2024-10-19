@@ -99,7 +99,6 @@ func (s *Sorter[T]) fill() (bool, error) {
 
 	has := s.scanner != nil
 	for ; wn > 0 && has; has = s.scanner.Next() {
-		// for wn > 0 && s.scanner.Next() {
 		obj := s.scanner.Value()
 		txt := s.lens.Get(&obj)
 		v32, err := s.embed.Embedding(context.Background(), txt)
