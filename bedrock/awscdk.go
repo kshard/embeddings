@@ -42,10 +42,14 @@ func (c *FoundationModel) GrantAccess(grantee awsiam.IGrantable) {
 	)
 }
 
-func NewTitanTextEmbeddingsV1(scope constructs.Construct, id *string) *FoundationModel {
-	return NewFoundationModel(scope, id, awsbedrock.FoundationModelIdentifier_AMAZON_TITAN_EMBEDDINGS_G1_TEXT_V1())
+func NewTitanTextEmbeddingsV1(scope constructs.Construct) *FoundationModel {
+	return NewFoundationModel(scope, jsii.String("TitanTextEmbeddingsV1"),
+		awsbedrock.FoundationModelIdentifier_AMAZON_TITAN_EMBEDDINGS_G1_TEXT_V1(),
+	)
 }
 
-func NewTitanTextEmbeddingsV2(scope constructs.Construct, id *string) *FoundationModel {
-	return NewFoundationModel(scope, id, awsbedrock.FoundationModelIdentifier_AMAZON_TITAN_EMBED_TEXT_V2_0())
+func NewTitanTextEmbeddingsV2(scope constructs.Construct) *FoundationModel {
+	return NewFoundationModel(scope, jsii.String("TitanTextEmbeddingsV2"),
+		awsbedrock.FoundationModelIdentifier_AMAZON_TITAN_EMBED_TEXT_V2_0(),
+	)
 }
