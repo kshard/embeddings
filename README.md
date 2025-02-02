@@ -1,5 +1,4 @@
 <p align="center">
-  <img src="./doc/golem.svg" height="240" />
   <h3 align="center">Embeddings</h3>
   <p align="center"><strong>adapter over various popular vector embeddings interfaces: AWS BedRock, OpenAI, word2vec</strong></p>
 

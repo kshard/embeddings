@@ -36,14 +36,15 @@ import (
 //
 // Scanning stops unrecoverably at EOF or the first I/O error.
 type Scanner struct {
-	embed             embeddings.Embeddings
-	similarity        func([]float32, []float32) bool
-	windowInSentences int
-	scanner           Reader
-	err               error
-	eof               bool
-	window            []vector
-	cursor            []string
+	embed                 embeddings.Embeddings
+	confSimilarity        func([]float32, []float32) bool
+	confWindowInSentences int
+	confSimilarityWith    SimilarityWith
+	scanner               Reader
+	err                   error
+	eof                   bool
+	window                []vector
+	cursor                []string
 }
 
 // Reader is an interface similar to [bufio.Scanner].
@@ -62,24 +63,37 @@ type vector struct {
 // Creates new instance of Scanner to read from io.Reader and using embedding.
 func New(embed embeddings.Embeddings, r Reader) *Scanner {
 	return &Scanner{
-		embed:             embed,
-		similarity:        HighSimilarity,
-		windowInSentences: 32,
-		scanner:           r,
-		window:            make([]vector, 0),
+		embed:                 embed,
+		confSimilarity:        HighSimilarity,
+		confWindowInSentences: 32,
+		confSimilarityWith:    SIMILARITY_WITH_TAIL,
+		scanner:               r,
+		window:                make([]vector, 0),
 	}
 }
 
 // Similarity sets the similarity function for the Scanner.
 // The default is HighSimilarity.
 func (s *Scanner) Similarity(f func([]float32, []float32) bool) {
-	s.similarity = f
+	s.confSimilarity = f
+}
+
+// Similarity sets the behavior to sorting algorithms.
+//
+// Using SIMILARITY_WITH_HEAD configures algorithm to sort chunk similar
+// to the first element of chunk. The first element of chunk is stable during
+// the chunk forming.
+//
+// Using SIMILARITY_WITH_TAIL configures algorithm to sort chunk similar
+// to the last element of chunk. The last element is changed after new one is added to chunk.
+func (s *Scanner) SimilarityWith(x SimilarityWith) {
+	s.confSimilarityWith = x
 }
 
 // Widow defines the context window for similarity detection.
 // The default value is 32 sentences.
 func (s *Scanner) Window(n int) {
-	s.windowInSentences = n
+	s.confWindowInSentences = n
 }
 
 func (s *Scanner) Err() error     { return s.err }
@@ -106,7 +120,7 @@ func (s *Scanner) Scan() bool {
 
 // fill the window
 func (s *Scanner) fill() (bool, error) {
-	wn := s.windowInSentences - len(s.window)
+	wn := s.confWindowInSentences - len(s.window)
 	for wn > 0 && s.scanner.Scan() {
 		txt := s.scanner.Text()
 		v32, err := s.embed.Embedding(context.Background(), txt)
@@ -131,12 +145,21 @@ func (s *Scanner) peek() []string {
 		return nil
 	}
 
+	// split the window into similar (a) and non-similar (b) items
 	a, b := make([]vector, 0), make([]vector, 0)
 	a = append(a, s.window[0])
 
 	for i := 1; i < len(s.window); i++ {
-		tail := a[len(a)-1]
-		if s.similarity(tail.vector, s.window[i].vector) {
+		var at int
+		switch s.confSimilarityWith {
+		case SIMILARITY_WITH_HEAD:
+			at = 0
+		case SIMILARITY_WITH_TAIL:
+			at = len(a) - 1
+		}
+		ref := a[at]
+
+		if s.confSimilarity(ref.vector, s.window[i].vector) {
 			a = append(a, s.window[i])
 		} else {
 			b = append(b, s.window[i])

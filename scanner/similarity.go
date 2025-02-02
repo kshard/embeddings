@@ -42,6 +42,22 @@ func Dissimilar(a, b []float32) bool {
 	return 0.8 < x && x <= 1.0
 }
 
+// Similarity on custom cosine distance [lo, hi].
+// Use this range when you need custom interval.
+func RangeSimilarity(lo, hi float32) func(a, b []float32) bool {
+	return func(a, b []float32) bool {
+		x := cosine(a, b)
+		return lo <= x && x <= hi
+	}
+}
+
+// Similarity with custom assert of cosine distance
+func CosineSimilarity(f func(float32) bool) func(a, b []float32) bool {
+	return func(a, b []float32) bool {
+		return f(cosine(a, b))
+	}
+}
+
 func cosine(a, b []float32) (d float32) {
 	if len(a) != len(b) {
 		panic("vectors must have equal lengths")
