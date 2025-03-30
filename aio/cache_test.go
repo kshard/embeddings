@@ -6,21 +6,21 @@
 // https://github.com/kshard/embeddings
 //
 
-package cache_test
+package aio_test
 
 import (
 	"bytes"
 	"context"
 	"testing"
 
-	"github.com/kshard/embeddings/cache"
+	"github.com/kshard/embeddings/aio"
 )
 
 func TestCache(t *testing.T) {
 	kv := keyval{}
-	c := cache.New(kv, embed{})
+	c := aio.NewCache(kv, mockVector())
 
-	if c.ConsumedTokens() != 10 {
+	if c.UsedTokens() != 10 {
 		t.Errorf("unexpected ConsumedTokens output")
 	}
 
@@ -33,15 +33,6 @@ func TestCache(t *testing.T) {
 			t.Errorf("unexpected key")
 		}
 	}
-}
-
-// mock embedding client
-type embed struct{}
-
-func (embed) ConsumedTokens() int { return 10 }
-
-func (embed) Embedding(ctx context.Context, text string) ([]float32, error) {
-	return []float32{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0}, nil
 }
 
 // mock key-value

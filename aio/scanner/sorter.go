@@ -31,7 +31,7 @@ import (
 // The module provides high, medium, weak and dissimilarity functions based on
 // cosine distance.
 type Sorter[T any] struct {
-	embed                 embeddings.Embeddings
+	embed                 embeddings.Embedder
 	confSimilarity        func([]float32, []float32) bool
 	confWindowInSentences int
 	confSimilarityWith    SimilarityWith
@@ -58,7 +58,7 @@ type typed[T any] struct {
 }
 
 // Creates new instance of semantic Sorter, seq.Seq[T] is source of records.
-func NewSorter[T any](embed embeddings.Embeddings, lens optics.Lens[T, string], seq seq.Seq[T]) *Sorter[T] {
+func NewSorter[T any](embed embeddings.Embedder, lens optics.Lens[T, string], seq seq.Seq[T]) *Sorter[T] {
 	return &Sorter[T]{
 		embed:                 embed,
 		confSimilarity:        HighSimilarity,
@@ -129,7 +129,7 @@ func (s *Sorter[T]) fill() (bool, error) {
 			return false, fmt.Errorf("embedding has failed: %w, for {%s}", err, txt)
 		}
 
-		s.window = append(s.window, typed[T]{object: obj, vector: v32})
+		s.window = append(s.window, typed[T]{object: obj, vector: v32.Vector})
 		wn--
 	}
 

@@ -14,7 +14,8 @@ import (
 	"testing"
 
 	"github.com/fogfish/it/v2"
-	"github.com/kshard/embeddings/scanner"
+	"github.com/kshard/embeddings"
+	"github.com/kshard/embeddings/aio/scanner"
 )
 
 func TestScanner(t *testing.T) {
@@ -42,9 +43,12 @@ func TestScanner(t *testing.T) {
 
 type embed struct{}
 
-func (embed) ConsumedTokens() int { return 0 }
-func (embed) Embedding(ctx context.Context, text string) ([]float32, error) {
-	return []float32{float32(len(text))}, nil
+func (embed) UsedTokens() int { return 0 }
+func (embed) Embedding(ctx context.Context, text string) (embeddings.Embedding, error) {
+	return embeddings.Embedding{
+		Text:   text,
+		Vector: []float32{float32(len(text))},
+	}, nil
 }
 
 func similar(a, b []float32) bool { return a[0] == b[0] }
