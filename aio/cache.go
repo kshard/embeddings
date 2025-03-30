@@ -67,7 +67,10 @@ func (c *Cache) Embedding(ctx context.Context, text string) (embeddings.Embeddin
 	}
 
 	if len(val) != 0 {
-		return embeddings.Embedding{Vector: decodeFVec(val)}, nil
+		return embeddings.Embedding{
+			Text:   text,
+			Vector: decodeFVec(val),
+		}, nil
 	}
 
 	reply, err := c.Embedder.Embedding(ctx, text)
