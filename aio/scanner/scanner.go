@@ -36,14 +36,14 @@ import (
 //
 // Scanning stops unrecoverably at EOF or the first I/O error.
 type Scanner struct {
-	embed                 embeddings.Embeddings
+	embed                 embeddings.Embedder
 	confSimilarity        func([]float32, []float32) bool
 	confWindowInSentences int
 	confSimilarityWith    SimilarityWith
 	scanner               Reader
 	err                   error
 	eof                   bool
-	window                []vector
+	window                []embeddings.Embedding
 	cursor                []string
 }
 
@@ -55,20 +55,15 @@ type Reader interface {
 	Err() error
 }
 
-type vector struct {
-	text   string
-	vector []float32
-}
-
 // Creates new instance of Scanner to read from io.Reader and using embedding.
-func New(embed embeddings.Embeddings, r Reader) *Scanner {
+func New(embed embeddings.Embedder, r Reader) *Scanner {
 	return &Scanner{
 		embed:                 embed,
 		confSimilarity:        HighSimilarity,
 		confWindowInSentences: 32,
 		confSimilarityWith:    SIMILARITY_WITH_TAIL,
 		scanner:               r,
-		window:                make([]vector, 0),
+		window:                make([]embeddings.Embedding, 0),
 	}
 }
 
@@ -128,7 +123,7 @@ func (s *Scanner) fill() (bool, error) {
 			return false, fmt.Errorf("embedding has failed: %w, for {%s}", err, txt)
 		}
 
-		s.window = append(s.window, vector{text: txt, vector: v32})
+		s.window = append(s.window, v32)
 		wn--
 	}
 
@@ -146,7 +141,7 @@ func (s *Scanner) peek() []string {
 	}
 
 	// split the window into similar (a) and non-similar (b) items
-	a, b := make([]vector, 0), make([]vector, 0)
+	a, b := make([]embeddings.Embedding, 0), make([]embeddings.Embedding, 0)
 	a = append(a, s.window[0])
 
 	for i := 1; i < len(s.window); i++ {
@@ -159,7 +154,7 @@ func (s *Scanner) peek() []string {
 		}
 		ref := a[at]
 
-		if s.confSimilarity(ref.vector, s.window[i].vector) {
+		if s.confSimilarity(ref.Vector, s.window[i].Vector) {
 			a = append(a, s.window[i])
 		} else {
 			b = append(b, s.window[i])
@@ -170,7 +165,7 @@ func (s *Scanner) peek() []string {
 
 	seq := make([]string, len(a))
 	for i, x := range a {
-		seq[i] = x.text
+		seq[i] = x.Text
 	}
 	return seq
 }

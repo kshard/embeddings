@@ -14,7 +14,7 @@ import (
 	"github.com/fogfish/golem/optics"
 	"github.com/fogfish/golem/trait/seq"
 	"github.com/fogfish/it/v2"
-	"github.com/kshard/embeddings/scanner"
+	"github.com/kshard/embeddings/aio/scanner"
 )
 
 type obj struct {

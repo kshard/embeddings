@@ -1,12 +1,12 @@
 //
-// Copyright (C) 2024 Dmitry Kolesnikov
+// Copyright (C) 2024 - 2025 Dmitry Kolesnikov
 //
 // This file may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
 // https://github.com/kshard/embeddings
 //
 
-package cache
+package aio
 
 import (
 	"context"
@@ -18,52 +18,72 @@ import (
 	"github.com/kshard/embeddings"
 )
 
+// Getter interface abstract storage
+type Getter interface{ Get([]byte) ([]byte, error) }
+
+// Setter interface abstract storage
+type Putter interface{ Put([]byte, []byte) error }
+
+// KeyVal interface
+type KeyVal interface {
+	Getter
+	Putter
+}
+
+type Cache struct {
+	embeddings.Embedder
+	cache KeyVal
+}
+
+var _ embeddings.Embedder = (*Cache)(nil)
+
 // Creates caching layer for embeddings client.
 //
 // Use github.com/akrylysov/pogreb to cache embedding on local file systems:
 //
 //	cli, err := /* create embeddings client */
 //	db, err := pogreb.Open("embeddings.cache", nil)
-//	text := cache.New(db, cli)
-func New(cache Cache, embed embeddings.Embeddings) *Client {
-	return &Client{
-		embed: embed,
-		cache: cache,
+//	text := cache.NewCache(db, cli)
+func NewCache(cache KeyVal, embedder embeddings.Embedder) *Cache {
+	return &Cache{
+		Embedder: embedder,
+		cache:    cache,
 	}
 }
 
-func (c *Client) HashKey(text string) []byte {
+func (c *Cache) HashKey(text string) []byte {
 	hash := sha1.New()
 	hash.Write([]byte(text))
 	return hash.Sum(nil)
 }
 
-func (c *Client) ConsumedTokens() int { return c.embed.ConsumedTokens() }
-
 // Calculates embedding vector
-func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) {
+func (c *Cache) Embedding(ctx context.Context, text string) (embeddings.Embedding, error) {
 	hkey := c.HashKey(text)
 
 	val, err := c.cache.Get(hkey)
 	if err != nil {
-		return nil, err
+		return embeddings.Embedding{}, err
 	}
 
 	if len(val) != 0 {
-		return decodeFVec(val), nil
+		return embeddings.Embedding{
+			Text:   text,
+			Vector: decodeFVec(val),
+		}, nil
 	}
 
-	vec, err := c.embed.Embedding(ctx, text)
+	reply, err := c.Embedder.Embedding(ctx, text)
 	if err != nil {
-		return nil, err
+		return embeddings.Embedding{}, err
 	}
 
-	err = c.cache.Put(hkey, encodeFVec(vec))
+	err = c.cache.Put(hkey, encodeFVec(reply.Vector))
 	if err != nil {
 		slog.Warn("failed to cache vector", "error", err)
 	}
 
-	return vec, nil
+	return reply, nil
 }
 
 func encodeFVec(v []float32) []byte {

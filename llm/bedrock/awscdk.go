@@ -9,6 +9,7 @@
 package bedrock
 
 import (
+	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsbedrock"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsiam"
 	"github.com/aws/constructs-go/constructs/v10"
@@ -38,6 +39,27 @@ func (c *FoundationModel) GrantAccess(grantee awsiam.IGrantable) {
 			Grantee:      grantee,
 			Actions:      jsii.Strings("bedrock:InvokeModel"),
 			ResourceArns: jsii.Strings(*c.embeddings.ModelArn()),
+		},
+	)
+}
+
+func (c *FoundationModel) GrantAccessIn(grantee awsiam.IGrantable, region *string) {
+	arn := awscdk.Stack_Of(c.Construct).FormatArn(
+		&awscdk.ArnComponents{
+			ArnFormat:    awscdk.ArnFormat_SLASH_RESOURCE_NAME,
+			Service:      jsii.String("bedrock"),
+			Account:      jsii.String(""),
+			Region:       region,
+			Resource:     jsii.String("foundation-model"),
+			ResourceName: c.embeddings.ModelId(),
+		},
+	)
+
+	awsiam.Grant_AddToPrincipal(
+		&awsiam.GrantOnPrincipalOptions{
+			Grantee:      grantee,
+			Actions:      jsii.Strings("bedrock:InvokeModel"),
+			ResourceArns: jsii.Strings(*arn),
 		},
 	)
 }

@@ -14,7 +14,7 @@ import (
 	"testing"
 
 	"github.com/fogfish/it/v2"
-	"github.com/kshard/embeddings/scanner"
+	"github.com/kshard/embeddings/aio/scanner"
 )
 
 func TestSplitSentences(t *testing.T) {
