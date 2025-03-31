@@ -15,76 +15,87 @@ import (
 
 	"github.com/fogfish/gurl/v2/http"
 	ø "github.com/fogfish/gurl/v2/http/send"
+	"github.com/fogfish/opts"
 	"github.com/jdxcode/netrc"
+	"github.com/kshard/embeddings"
 )
 
-type Option func(*Client)
-
-type ModelID string
+type LLM string
 
 const (
-	TEXT_EMBEDDING_3_SMALL = ModelID("text-embedding-3-small")
-	TEXT_EMBEDDING_3_LARGE = ModelID("text-embedding-3-large")
-	TEXT_ADA_002           = ModelID("text-embedding-ada-002")
+	TEXT_EMBEDDING_3_SMALL = LLM("text-embedding-3-small")
+	TEXT_EMBEDDING_3_LARGE = LLM("text-embedding-3-large")
+	TEXT_ADA_002           = LLM("text-embedding-ada-002")
 )
 
-func WithModel(id ModelID) Option {
-	return func(c *Client) {
-		c.model = id
-	}
+type Option = opts.Option[Client]
+
+func (c *Client) checkRequired() error {
+	return opts.Required(c,
+		WithLLM(""),
+		WithHTTP(nil),
+	)
 }
 
-func WithHTTP(opts ...http.Config) Option {
-	return func(c *Client) {
-		c.Stack = http.New(opts...)
+var (
+	// Set OpenAI LLM
+	//
+	// This option is required.
+	WithLLM = opts.ForType[Client, LLM]()
+
+	// Config HTTP stack
+	WithHTTP = opts.Use[Client](http.NewStack)
+
+	// Config the host, api.openai.com is default
+	WithHost = opts.ForType[Client, ø.Authority]()
+
+	// Config API secret key
+	WithSecret = opts.ForName[Client, string]("secret")
+
+	// Set api secret from ~/.netrc file
+	WithNetRC = opts.FMap(withNetRC)
+)
+
+func withNetRC(h *Client, host string) error {
+	if h.secret != "" {
+		return nil
 	}
-}
 
-func WithSecret(secret string) Option {
-	return func(c *Client) {
-		c.secret = "Bearer " + secret
+	usr, err := user.Current()
+	if err != nil {
+		return err
 	}
-}
 
-func WithNetRC(host string) Option {
-	return func(c *Client) {
-		if c.secret != "" {
-			return
-		}
-
-		usr, err := user.Current()
-		if err != nil {
-			panic(err)
-		}
-
-		n, err := netrc.Parse(filepath.Join(usr.HomeDir, ".netrc"))
-		if err != nil {
-			panic(err)
-		}
-
-		machine := n.Machine(host)
-		if machine == nil {
-			panic(fmt.Errorf("undefined secret for host <%s> at ~/.netrc", host))
-		}
-
-		c.secret = "Bearer " + machine.Get("password")
+	n, err := netrc.Parse(filepath.Join(usr.HomeDir, ".netrc"))
+	if err != nil {
+		return err
 	}
+
+	machine := n.Machine(host)
+	if machine == nil {
+		return fmt.Errorf("undefined secret for host <%s> at ~/.netrc", host)
+	}
+
+	h.secret = machine.Get("password")
+	return nil
 }
 
 type Client struct {
 	http.Stack
-	host           ø.Authority
-	secret         string
-	model          ModelID
-	consumedTokens int
+	host       ø.Authority
+	secret     string
+	model      LLM
+	usedTokens int
 }
+
+var _ embeddings.Embedder = (*Client)(nil)
 
 type request struct {
-	Model ModelID `json:"model"`
-	Text  string  `json:"input"`
+	Model LLM    `json:"model"`
+	Text  string `json:"input"`
 }
 
-type embeddings struct {
+type embedding struct {
 	Object  string   `json:"object"`
 	Vectors []vector `json:"data"`
 	Model   string   `json:"model"`

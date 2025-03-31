@@ -10,39 +10,25 @@ package word2vec
 
 import (
 	"context"
-	"errors"
 
+	"github.com/fogfish/opts"
 	"github.com/fogfish/word2vec"
+	"github.com/kshard/embeddings"
 )
 
 // Creates word2vec embeddings client.
-//
-// # It requires configuration of the path to trained model
-//
-// The client is configurable using
-//
-//	WithModel(path string)
-//	WithVectorSize(size int)
-func New(opts ...Option) (*Client, error) {
+func New(opt ...Option) (*Client, error) {
 	api := &Client{}
 
-	defs := []Option{
-		WithVectorSize(300),
+	if err := opts.Apply(api, opt); err != nil {
+		return nil, err
 	}
 
-	for _, opt := range defs {
-		opt(api)
+	if err := api.checkRequired(); err != nil {
+		return nil, err
 	}
 
-	for _, opt := range opts {
-		opt(api)
-	}
-
-	if api.model == "" {
-		return nil, errors.New("model is not defined")
-	}
-
-	w2v, err := word2vec.Load(api.model, api.vectorSize)
+	w2v, err := word2vec.Load(api.model, api.embeddingSize)
 	if err != nil {
 		return nil, err
 	}
@@ -52,14 +38,17 @@ func New(opts ...Option) (*Client, error) {
 }
 
 // Number of tokens consumed within the session
-func (c *Client) ConsumedTokens() int { return c.consumedTokens }
+func (c *Client) UsedTokens() int { return c.consumedTokens }
 
 // Calculates embedding vector
-func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) {
-	vec := make([]float32, c.vectorSize)
+func (c *Client) Embedding(ctx context.Context, text string) (embeddings.Embedding, error) {
+	vec := make([]float32, c.embeddingSize)
 	err := c.w2v.Embedding(text, vec)
 	if err != nil {
-		return nil, err
+		return embeddings.Embedding{}, err
 	}
-	return vec, nil
+	return embeddings.Embedding{
+		Text:   text,
+		Vector: vec,
+	}, nil
 }

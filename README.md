@@ -25,50 +25,30 @@
     <thead><tr><th>sub-module</th><th>doc</th><th>about</th></tr></thead>
     <tbody>
     <!-- Module bedrock -->
-    <tr><td><a href="./bedrock/">
-      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=bedrock/*"/>
+    <tr><td><a href="./llm/bedrock/">
+      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=llm/bedrock/*"/>
     </a></td>
-    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/bedrock">
+    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/llm/bedrock">
       <img src="https://img.shields.io/badge/doc-bedrock-007d9c?logo=go&logoColor=white&style=flat-square" />
     </a></td>
     <td>
     AWS Bedrock embeddings models
     </td></tr>
-		<!-- Module cache -->
-    <tr><td><a href="./cache/">
-      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=cache/*"/>
-    </a></td>
-    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/cache">
-      <img src="https://img.shields.io/badge/doc-cache-007d9c?logo=go&logoColor=white&style=flat-square" />
-    </a></td>
-    <td>
-    Caching vector embeddings
-    </td></tr>
 		<!-- Module openai -->
-    <tr><td><a href="./openai/">
-      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=openai/*"/>
+    <tr><td><a href="./llm/openai/">
+      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=llm/openai/*"/>
     </a></td>
-    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/openai">
+    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/llm/openai">
       <img src="https://img.shields.io/badge/doc-openai-007d9c?logo=go&logoColor=white&style=flat-square" />
     </a></td>
     <td>
     OpenAI embeddings models
     </td></tr>
-		<!-- Module scanner -->
-    <tr><td><a href="./scanner/">
-      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=scanner/*"/>
-    </a></td>
-    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/scanner">
-      <img src="https://img.shields.io/badge/doc-scanner-007d9c?logo=go&logoColor=white&style=flat-square" />
-    </a></td>
-    <td>
-    Semantic chunking utility
-    </td></tr>
 		<!-- Module word2vec -->
-    <tr><td><a href="./scanner/">
-      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=word2vec/*"/>
+    <tr><td><a href="./llm/word2vec/">
+      <img src="https://img.shields.io/github/v/tag/kshard/embeddings?label=version&filter=llm/word2vec/*"/>
     </a></td>
-    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/scanner">
+    <td><a href="https://pkg.go.dev/github.com/kshard/embeddings/llm/word2vec">
       <img src="https://img.shields.io/badge/doc-word2vec-007d9c?logo=go&logoColor=white&style=flat-square" />
     </a></td>
     <td>
@@ -84,12 +64,17 @@
 The library implements generic trait to transform text into vector embeddings.
 
 ```go
-type Embeddings interface {
-	Embedding(ctx context.Context, text string) ([]float32, error)
+type Embedder interface {
+	Embedding(ctx context.Context, text string) (Embedding, error)
 }
 ```
 
-The library is structured from submodules, each implements the defined interface towards vendor. 
+The library defines common embedding I/O utlities throught this generic trait:
+* Caching of embeddings
+* Embeddings I/O Rate Limiter
+* Semantic Chunking (Sanning)
+
+The library also defines adapter for common text Embeddings api, each define as own submodule: 
 * [AWS BedRock embeddings](https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html)
 * [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) 
 * [word2vec model](https://github.com/fogfish/word2vec)
@@ -106,9 +91,6 @@ text, err := embeddings.New(/* config options */)
 
 // Calculate embeddings
 vector, err := text.Embedding(context.Background(), "text embeddings")
-
-// Checks number of tokens consumed by active sessions
-text.ConsumedTokens()
 ```
 
 ## How To Contribute

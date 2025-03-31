@@ -9,26 +9,37 @@
 package word2vec
 
 import (
+	"github.com/fogfish/opts"
 	"github.com/fogfish/word2vec"
+	"github.com/kshard/embeddings"
 )
 
-type Option func(*Client)
+type Option = opts.Option[Client]
 
-func WithModel(path string) Option {
-	return func(c *Client) {
-		c.model = path
-	}
+func (c *Client) checkRequired() error {
+	return opts.Required(c,
+		WithLLM(""),
+		WithEmbeddingSize(0),
+	)
 }
 
-func WithVectorSize(size int) Option {
-	return func(c *Client) {
-		c.vectorSize = size
-	}
-}
+var (
+	// Set path to trained word2vec model
+	//
+	// This option is required.
+	WithLLM = opts.ForName[Client, string]("model")
+
+	// Set the dimension of embeddings vector
+	//
+	// This option is required.
+	WithEmbeddingSize = opts.ForName[Client, int]("embeddingSize")
+)
 
 type Client struct {
 	model          string
-	vectorSize     int
+	embeddingSize  int
 	w2v            word2vec.Model
 	consumedTokens int
 }
+
+var _ embeddings.Embedder = (*Client)(nil)
