@@ -13,71 +13,48 @@ import (
 	"encoding/json"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
+	"github.com/fogfish/opts"
+	"github.com/kshard/embeddings"
 )
 
 // Creates AWS BedRock embeddings client.
 //
-// By default `us-east-1` region is used, supply custom `aws.Config`
+// By default `us-west-2` region is used, supply custom `aws.Config`
 // to alter behavior.
 //
 // The client is configurable using
 //
 //	WithConfig(cfg aws.Config)
-func New(opts ...Option) (*Client, error) {
-	embeddings := &Client{}
+func New(opt ...Option) (*Client, error) {
+	c := &Client{}
 
-	defs := []Option{
-		WithModel(TITAN_EMBED_TEXT_V2),
-	}
-
-	for _, opt := range defs {
-		opt(embeddings)
-	}
-
-	for _, opt := range opts {
-		opt(embeddings)
-	}
-
-	api, err := newService(embeddings)
-	if err != nil {
-		return nil, err
-	}
-	embeddings.api = api
-
-	return embeddings, nil
-}
-
-func newService(embeddings *Client) (*bedrockruntime.Client, error) {
-	if embeddings.api != nil {
-		return embeddings.api, nil
-	}
-
-	aws, err := config.LoadDefaultConfig(
-		context.Background(),
-		config.WithRegion("us-east-1"),
-	)
-	if err != nil {
+	if err := opts.Apply(c, opt); err != nil {
 		return nil, err
 	}
 
-	return bedrockruntime.NewFromConfig(aws), nil
+	if c.api == nil {
+		if err := optsFromRegion(c, defaultRegion); err != nil {
+			return nil, err
+		}
+	}
+
+	return c, c.checkRequired()
 }
 
 // Number of tokens consumed within the session
-func (c *Client) ConsumedTokens() int { return c.consumedTokens }
+func (c *Client) UsedTokens() int { return c.usedTokens }
 
 // Calculates embedding vector
-func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) {
+func (c *Client) Embedding(ctx context.Context, text string) (embeddings.Embedding, error) {
 	body, err := json.Marshal(
 		request{
 			Text:       text,
-			Dimensions: c.dimensions,
+			Dimensions: c.embeddingSize,
 		},
 	)
 	if err != nil {
-		return nil, err
+		return embeddings.Embedding{}, err
 	}
 
 	req := &bedrockruntime.InvokeModelInput{
@@ -88,15 +65,19 @@ func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) 
 
 	result, err := c.api.InvokeModel(ctx, req)
 	if err != nil {
-		return nil, err
+		return embeddings.Embedding{}, err
 	}
 
-	var embeddings embeddings
-	if err := json.Unmarshal(result.Body, &embeddings); err != nil {
-		return nil, err
+	var embedding embedding
+	if err := json.Unmarshal(result.Body, &embedding); err != nil {
+		return embeddings.Embedding{}, err
 	}
 
-	c.consumedTokens += embeddings.UsedTextTokens
+	c.usedTokens += embedding.UsedTextTokens
 
-	return embeddings.Vector, nil
+	return embeddings.Embedding{
+		Text:       text,
+		Vector:     embedding.Vector,
+		UsedTokens: embedding.UsedTextTokens,
+	}, nil
 }

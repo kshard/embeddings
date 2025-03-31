@@ -8,4 +8,4 @@
 
 package word2vec
 
-const Version = "word2vec/v0.1.0"
+const Version = "llm/word2vec/v0.2.0"

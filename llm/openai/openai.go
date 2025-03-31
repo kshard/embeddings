@@ -15,6 +15,8 @@ import (
 	"github.com/fogfish/gurl/v2/http"
 	ƒ "github.com/fogfish/gurl/v2/http/recv"
 	ø "github.com/fogfish/gurl/v2/http/send"
+	"github.com/fogfish/opts"
+	"github.com/kshard/embeddings"
 )
 
 // Creates OpenAI embeddings client.
@@ -28,41 +30,32 @@ import (
 //	WithNetRC(host string)
 //	WithModel(...)
 //	WithHTTP(opts ...http.Config)
-func New(opts ...Option) (*Client, error) {
+func New(opt ...Option) (*Client, error) {
 	api := &Client{
-		host: ø.Authority("api.openai.com"),
+		host: ø.Authority("https://api.openai.com"),
 	}
 
-	defs := []Option{
-		WithModel(TEXT_EMBEDDING_3_SMALL),
-		WithNetRC(string(api.host)),
-	}
-
-	for _, opt := range defs {
-		opt(api)
-	}
-
-	for _, opt := range opts {
-		opt(api)
+	if err := opts.Apply(api, opt); err != nil {
+		return nil, err
 	}
 
 	if api.Stack == nil {
 		api.Stack = http.New()
 	}
 
-	return api, nil
+	return api, api.checkRequired()
 }
 
 // Number of tokens consumed within the session
-func (c *Client) ConsumedTokens() int { return c.consumedTokens }
+func (c *Client) UsedTokens() int { return c.usedTokens }
 
 // Calculates embedding vector
-func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) {
-	bag, err := http.IO[embeddings](c.WithContext(ctx),
+func (c *Client) Embedding(ctx context.Context, text string) (embeddings.Embedding, error) {
+	bag, err := http.IO[embedding](c.WithContext(ctx),
 		http.POST(
-			ø.URI("https://%s/v1/embeddings", c.host),
+			ø.URI("%s/v1/embeddings", c.host),
 			ø.Accept.JSON,
-			ø.Authorization.Set(c.secret),
+			ø.Authorization.Set("Bearer "+c.secret),
 			ø.ContentType.JSON,
 			ø.Send(request{
 				Model: c.model,
@@ -74,14 +67,18 @@ func (c *Client) Embedding(ctx context.Context, text string) ([]float32, error) 
 		),
 	)
 	if err != nil {
-		return nil, err
+		return embeddings.Embedding{}, err
 	}
 
 	if len(bag.Vectors) != 1 {
-		return nil, errors.New("invalid response")
+		return embeddings.Embedding{}, errors.New("invalid response")
 	}
 
-	c.consumedTokens += bag.Usage.UsedTokens
+	c.usedTokens += bag.Usage.UsedTokens
 
-	return bag.Vectors[0].Vector, nil
+	return embeddings.Embedding{
+		Text:       text,
+		Vector:     bag.Vectors[0].Vector,
+		UsedTokens: bag.Usage.UsedTokens,
+	}, nil
 }

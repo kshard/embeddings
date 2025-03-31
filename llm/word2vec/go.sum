@@ -1,2 +1,12 @@
+github.com/fogfish/golem/hseq v1.3.0 h1:WIJViOF7vsPHvqVLzFrIz4QrBI4EPTC34esrQnjqUvk=
+github.com/fogfish/golem/hseq v1.3.0/go.mod h1:17XORt8nNKl6KOhF43MHSmjK8NksbkBsohAoJGiinUs=
+github.com/fogfish/golem/optics v0.14.0 h1:8XFZ6rlr6GlwDPB/jUtEcPbFngbpY9DfArDXcFN2mts=
+github.com/fogfish/golem/optics v0.14.0/go.mod h1:aTXUA/VC6yu3zbUN1Tmy4Z4IW0jxfDFF4c2UB5MuwkA=
+github.com/fogfish/it/v2 v2.2.1 h1:NuuaENAZka8XiJkEj2Q6THRsHSwleC/BLDux82NvkII=
+github.com/fogfish/it/v2 v2.2.1/go.mod h1:HHwufnTaZTvlRVnSesPl49HzzlMrQtweKbf+8Co/ll4=
+github.com/fogfish/opts v0.0.5 h1:Bh3Nucr1kx7G1F0Tq3DxO14/qYgmR6C2GjWr2k6O+Oc=
+github.com/fogfish/opts v0.0.5/go.mod h1:+HM1YrMsTzfouZRoHfPOsGT9VZw+0ZBKZ36PMqoNFqM=
 github.com/fogfish/word2vec v0.0.0-20240719202529-86d9af74f0ca h1:uWYwo0aVXvU9tKyZSuh4e0Pdf5mzNHDqDaOwO9CsiG4=
 github.com/fogfish/word2vec v0.0.0-20240719202529-86d9af74f0ca/go.mod h1:bTVg8hy/jLRSV4sxReQwYOCuprLyn2R4FGVWRxn2KCY=
+github.com/kshard/embeddings v0.2.0 h1:6qCxRHgXmtnrJ5fxEhd/hVEAoEf8ZLh9uxLO75nTSk8=
+github.com/kshard/embeddings v0.2.0/go.mod h1:brIUA6EPtFWO4RRrye7CWi6rAd003xIC2rHZkjq2dDY=
